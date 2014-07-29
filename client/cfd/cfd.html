@@ -1,0 +1,88 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+<script src="/bower_components/angular/angular.min.js"></script>
+<script src="/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+<script src="/bower_components/angular-resource/angular-resource.min.js"></script>
+<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script src="/bower_components/momentjs/min/moment.min.js"></script>
+<script src="/bower_components/underscore/underscore.js"></script>
+<script src="/bower_components/angular-google-chart/ng-google-chart.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/cfd/cfd.sys.config.js"></script>
+<script src="/cfd/cfd.config.js"></script>
+<script src="/cfd/cfd.service.js"></script>
+<script src="/cfd/cfd.chart.js"></script>
+<script src="/cfd/cfd.js"></script>
+</head>
+<body ng-app="Kanban" ng-controller="KanbanCtrl">
+<form class="form-inline" style="margin-top: 10px">
+  <button class="btn btn-small btn-info form-group col-md-3" style="margin-left: 15px;" ng-click="initHistoricalData()">
+    Load historical data starting from
+  </button>
+   <div class="form-group col-md-3">
+    <div class="input-group">
+      <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="startDate" is-open="calendarStatus['startDate']" datepicker-options="dateOptions" ng-required="true" close-text="Close" placeholder="Start Date"/>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="openCalendar($event, 'startDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div>
+  </div>
+  <div class="form-group col-md-3">
+    <div class="input-group">
+      <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="endDate" is-open="calendarStatus['endDate']" datepicker-options="dateOptions" ng-required="true" close-text="Close" placeholder="End Date"/>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="openCalendar($event, 'endDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div>
+  </div>
+  <button class="btn btn-small btn-success" ng-click="refreshGraph()">
+    Refresh graph
+  </button>
+</form>
+<tabset style="padding-left: 15px;">
+  <tab heading="CFD" active="activeTab.cfd" ng-controller="CumulativeFlowDiagramCtrl">
+    <div class="checkbox">
+      <input type="checkbox" ng-model="showByOwner" ng-click="byOwner()"/>
+      <label>By Owner</label>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div google-chart chart="cfdChartConfig" style="height:400px; width:100%;"></div>
+      </div>
+    </div>
+    <accordion close-others="false" ng-show="showByOwner" style="width: 100%;">
+     <accordion-group heading="{{owner.name}}" is-open="owner.open" ng-repeat="owner in allOwners">
+        <div id="{{owner.id}}" google-chart chart="ownerChartConfigs[owner.id]" style="height:400px; width:100%;"></div>
+      </accordion-group>
+    </accordion>
+  </tab>
+  <tab heading="Item Detail" active="activeTab.item" select="showKanbanItemGraph()" ng-show="needItemDetailGraph" ng-controller="KanbanItemDetailCtrl">
+    <form class="form-inline" style="margin: 10 0 0 15">
+      <div class="form-group col-md-12">
+        <label>Show item detail whose Kanban Cycle &gt; </label>
+        <input type="text" style="width: 40px" ng-model="kanbanCycleDuration" placeholder="days" ng-change="refreshKanbanItemGraph(itemTypes, itemStatus)" ng-required="true"/>
+      </div>
+      <div class="form-group col-md-12">
+        <label ng-show="itemTypes.length > 1" style="margin-left: 10px;">Types: </label>
+        <span ng-show="itemTypes.length > 1" ng-repeat="type in itemTypes">
+          <input type="checkbox" ng-model="type.selected"/>
+          <span>{{type.name}}</span>
+        </span>
+
+        <label style="margin-left: 50px;">Status: </label>
+        <span ng-repeat="status in itemStatus">
+          <input type="checkbox" ng-model="status.selected"/>
+          <span>{{status.name}}</span>
+        </span>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="itemKanbanDetail" google-chart chart="itemChartConfig" style="height:600px; width:100%;"></div>
+        </div>
+      </div>
+    </form>
+  </tab>
+</tabset>
+</body>
+</html>

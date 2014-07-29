@@ -1,0 +1,19 @@
+[{
+  "objectID": 12348,
+  "type": "Defect",
+  "owner": "Lincoln",
+  "statusChangeLog": [{
+    "from": "2014-05-05T22:21:10.578Z",
+    "to": "2014-05-06T08:21:10.578Z",
+    "status": "In Dev"
+  },{
+    "from": "2014-05-06T08:21:10.578Z",
+    "to": "2014-05-06T14:21:10.578Z",
+    "status": "Ready for Test"
+  },{
+    "from": "2014-05-06T14:21:10.578Z",
+    "to": "9999-12-31T08:21:10.578Z",
+    "status": "In Test"
+  }],
+  "kanbanizedOn": "2014-04-29T08:21:10.578Z"
+}]

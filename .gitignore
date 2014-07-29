@@ -1,0 +1,5 @@
+data
+server/test/storage
+client/bower_components
+node_modules
+*sublime*

@@ -1,0 +1,53 @@
+{
+  "name": "kanban-cfd",
+  "version": "0.1.0",
+  "description": "Kanban CFD Visualization",
+  "main": "index.js",
+  "keywords": [
+    "Kanban",
+    "CFD",
+    "Visualize",
+    "Rally"
+  ],
+  "author": "Ken Chen",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "0.10.14-0",
+    "express": "^3.5.1",
+    "moment": "^2.5.1",
+    "moment-range": "^1.0.1",
+    "nedb": "^0.10.5",
+    "node-schedule": "^0.1.13",
+    "socket.io": "^0.9.16",
+    "underscore": "^1.6.0",
+    "restler": "^3.2.0"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "gulp": "^3.8.1",
+    "gulp-browserify": "^0.5.0",
+    "gulp-jshint": "^1.6.2",
+    "gulp-mocha": "^0.4.1",
+    "gulp-rename": "^1.2.0",
+    "karma": "^0.12.16",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-junit-reporter": "^0.2.2",
+    "karma-mocha": "^0.1.4",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "mocha": "~1.14.0",
+    "sinon": "^1.9.1"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kenspirit/kanban-cfd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kenspirit/kanban-cfd/issues"
+  },
+  "homepage": "https://github.com/kenspirit/kanban-cfd",
+  "readmeFilename": "readme.md"
+}

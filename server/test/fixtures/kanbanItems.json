@@ -1,0 +1,52 @@
+[{
+  "objectID": 12347,
+  "type": "Story",
+  "owner": "Winnie",
+  "statusChangeLog": [{
+    "from": "2014-04-28T08:21:10.578Z",
+    "to": "2014-04-29T08:21:10.578Z",
+    "status": "Prioritized"
+  },
+  {
+    "from": "2014-04-29T08:21:10.578Z",
+    "to": "2014-04-30T08:21:10.578Z",
+    "status": "Req"
+  },
+  {
+    "from": "2014-04-30T08:21:10.578Z",
+    "to": "2014-05-01T08:21:10.578Z",
+    "status": "Design"
+  },
+  {
+    "from": "2014-05-01T08:21:10.578Z",
+    "to": "2014-05-02T08:21:10.578Z",
+    "status": "In Dev"
+  },
+  {
+    "from": "2014-05-02T08:21:10.578Z",
+    "to": "2014-05-03T08:21:10.578Z",
+    "status": "Ready for Test"
+  }],
+  "kanbanizedOn": "2014-04-28T08:21:10.578Z"
+},
+{
+  "objectID": 12348,
+  "type": "Defect",
+  "owner": "Lincoln",
+  "statusChangeLog": [{
+    "from": "2014-04-29T08:21:10.578Z",
+    "to": "2014-05-05T08:21:10.578Z",
+    "status": "Prioritized"
+  },
+  {
+    "from": "2014-05-05T08:21:10.578Z",
+    "to": "2014-05-05T18:21:10.578Z",
+    "status": "Req"
+  },
+  {
+    "from": "2014-05-05T18:21:10.578Z",
+    "to": "9999-12-31T08:21:10.578Z",
+    "status": "In Dev"
+  }],
+  "kanbanizedOn": "2014-04-29T08:21:10.578Z"
+}]

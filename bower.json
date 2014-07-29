@@ -1,0 +1,37 @@
+{
+  "name": "kanban-cfd",
+  "main": "index.js",
+  "version": "0.1.0",
+  "authors": [
+    "Ken Chen <chengusky@gmail.com>"
+  ],
+  "description": "Kanban CFD Visualization",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/kenspirit/kanban-cfd",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "momentjs": "~2.6.0",
+    "underscore": "~1.6.0",
+    "angular-google-chart": "~0.0.9",
+    "angular": "~1.2.18",
+    "angular-sanitize": "~1.2.18",
+    "angular-resource": "~1.2.18",
+    "angular-bootstrap": "~0.11.0",
+    "bootstrap": "~3.1.1"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.20.1",
+    "angular-mocks": "~1.2.18"
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "QueryResult": {
+    "Errors": [],
+    "PageSize": 20,
+    "Results": [
+      {
+        "AcceptedDate": null,
+        "Attachments": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Attachments",
+          "_type": "Attachment"
+        },
+        "Blocked": false,
+        "BlockedReason": null,
+        "Blocker": null,
+        "Changesets": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Changesets",
+          "_type": "Changeset"
+        },
+        "Children": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Children",
+          "_type": "HierarchicalRequirement"
+        },
+        "CreationDate": "2012-11-23T07:26:35.269Z",
+        "DefectStatus": "NONE",
+        "Defects": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Defects",
+          "_type": "Defect"
+        },
+        "Description": "",
+        "DirectChildrenCount": 0,
+        "Discussion": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Discussion",
+          "_type": "ConversationPost"
+        },
+        "DisplayColor": null,
+        "DragAndDropRank": "P!!Lw~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "Feature": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/portfolioitem/feature/23452346256",
+          "_refObjectName": "Sample Feature",
+          "_refObjectUUID": "51e998cf-31ef-49ce-91eb-5d4dc0d7a4f2",
+          "_type": "PortfolioItem/Feature"
+        },
+        "FormattedID": "ST001",
+        "HasParent": false,
+        "InProgressDate": "2012-12-18T01:20:24.618Z",
+        "Iteration": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/iteration/986876876",
+          "_refObjectName": "I-76",
+          "_refObjectUUID": "712cf4ca-6d44-401b-aa7a-6f7464d1ede7",
+          "_type": "Iteration"
+        },
+        "LastUpdateDate": "2014-04-10T09:15:02.912Z",
+        "LatestDiscussionAgeInMinutes": null,
+        "Name": "Sample Story",
+        "Notes": "",
+        "ObjectID": 123456789,
+        "Owner": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/user/23452345234",
+          "_refObjectName": "Ken Chen",
+          "_refObjectUUID": "eec283c6-d4c7-4c45-9032-2cb7e6eaefee",
+          "_type": "User"
+        },
+        "Package": null,
+        "Parent": null,
+        "PlanEstimate": null,
+        "PortfolioItem": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/portfolioitem/feature/2454236235",
+          "_refObjectName": "Sample Feature",
+          "_refObjectUUID": "b1e998cf-31ef-49ce-91eb-5d4dc0d7a4f2",
+          "_type": "PortfolioItem/Feature"
+        },
+        "Predecessors": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Predecessors",
+          "_type": "HierarchicalRequirement"
+        },
+        "Project": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/project/9848372626",
+          "_refObjectName": "KEN",
+          "_refObjectUUID": "2e865276-7e4b-45a4-95d9-50359cc7b60b",
+          "_type": "Project"
+        },
+        "Ready": false,
+        "Recycled": false,
+        "Release": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/release/16486289925",
+          "_refObjectName": "R1",
+          "_refObjectUUID": "c3138256-df99-4d24-85e1-bfe5034b9d29",
+          "_type": "Release"
+        },
+        "RevisionHistory": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/revisionhistory/245234543",
+          "_refObjectUUID": "sd148265-a2f2-48e5-a1e6-14a3f49dc4e7",
+          "_type": "RevisionHistory"
+        },
+        "ScheduleState": "Completed",
+        "Subscription": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/subscription/120875978",
+          "_refObjectName": "TIC",
+          "_refObjectUUID": "rdd1e8cb-1efd-4bf4-8504-bddd54aa06b0",
+          "_type": "Subscription"
+        },
+        "Successors": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Successors",
+          "_type": "HierarchicalRequirement"
+        },
+        "Tags": {
+          "Count": 1,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Tags",
+          "_tagsNameArray": [
+            {
+              "Name": "DD",
+              "_ref": "/tag/2345434323"
+            }
+          ],
+          "_type": "Tag"
+        },
+        "TaskActualTotal": 0,
+        "TaskEstimateTotal": 9,
+        "TaskRemainingTotal": 0,
+        "TaskStatus": "COMPLETED",
+        "Tasks": {
+          "Count": 5,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/Tasks",
+          "_type": "Task"
+        },
+        "TestCaseStatus": "NONE",
+        "TestCases": {
+          "Count": 0,
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/HierarchicalRequirement/123456789/TestCases",
+          "_type": "TestCase"
+        },
+        "Workspace": {
+          "_rallyAPIMajor": "2",
+          "_rallyAPIMinor": "0",
+          "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/workspace/987654321",
+          "_refObjectName": "Story Workspace",
+          "_refObjectUUID": "a790710b-2218-4f60-ba28-ea4440fac9dc",
+          "_type": "Workspace"
+        },
+        "_CreatedAt": "Nov 23, 2012",
+        "_objectVersion": "61",
+        "_rallyAPIMajor": "2",
+        "_rallyAPIMinor": "0",
+        "_ref": "https://rally1.rallydev.com/slm/webservice/v2.0/hierarchicalrequirement/123456789",
+        "_refObjectName": "Sample Story",
+        "_refObjectUUID": "eac957a3-125c-4da0-b8ab-2d4c320701ee",
+        "_type": "HierarchicalRequirement",
+        "c_ARPModule": null,
+        "c_AffectedOffice": null,
+        "c_BALiaison": null,
+        "c_EstimatedCompletion": null,
+        "c_KanbanState": "Ready for Test",
+        "c_OSARModule": null,
+        "c_QAEffortEstimate": null,
+        "c_QALiaison": null,
+        "c_QAResourceAllocated": null,
+        "c_RelatedIPCCModule": null,
+        "c_ReleaseNotes": "",
+        "c_ReviewedDBA": false,
+        "c_ReviewedDomainDependency": false,
+        "c_SPSModule": null,
+        "c_Type": null
+      }
+    ],
+    "StartIndex": 1,
+    "TotalResultCount": 5,
+    "Warnings": [],
+    "_rallyAPIMajor": "2",
+    "_rallyAPIMinor": "0"
+  }
+}

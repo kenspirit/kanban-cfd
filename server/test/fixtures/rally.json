@@ -1,0 +1,150 @@
+{
+  "ETLDate": "2014-05-08T23:23:59.349Z",
+  "Errors": [],
+  "GeneratedQuery": {
+    "fields": {
+      "Name": 1,
+      "ObjectID": 1,
+      "Owner": 1,
+      "Project": 1,
+      "_TypeHierarchy": 1,
+      "_ValidFrom": 1,
+      "_ValidTo": 1,
+      "c_KanbanState": 1
+    },
+    "find": {
+      "_ProjectHierarchy": 483474373,
+      "_SnapshotDate": {
+        "$gte": "2014-04-26T04:00:00.000Z"
+      },
+      "_ValidFrom": {
+        "$lte": "2014-05-08T23:23:59.349Z"
+      },
+      "c_KanbanState": {
+        "$in": [
+          "Ready for Test",
+          "In Dev",
+          "Req",
+          "Prioritized",
+          "Design",
+          "Accepted",
+          "In Test"
+        ]
+      }
+    },
+    "limit": 2000,
+    "skip": 0
+  },
+  "PageSize": 2000,
+  "Results": [
+    {
+      "Name": "Sample Story",
+      "ObjectID": 2452462345,
+      "Owner": 2452345234,
+      "_TypeHierarchy": [
+        "PersistableObject",
+        "DomainObject",
+        "WorkspaceDomainObject",
+        "Artifact",
+        "Requirement",
+        "HierarchicalRequirement",
+        "HierarchicalRequirement"
+      ],
+      "_ValidFrom": "2014-04-28T05:51:25.749Z",
+      "_ValidTo": "2014-04-28T06:26:38.571Z",
+      "c_KanbanState": "Prioritized"
+    },
+    {
+      "Name": "Sample Story",
+      "ObjectID": 2452462345,
+      "Owner": 2452345234,
+      "_TypeHierarchy": [
+        "PersistableObject",
+        "DomainObject",
+        "WorkspaceDomainObject",
+        "Artifact",
+        "Requirement",
+        "HierarchicalRequirement",
+        "HierarchicalRequirement"
+      ],
+      "_ValidFrom": "2014-04-28T06:26:38.571Z",
+      "_ValidTo": "2014-04-29T06:03:32.083Z",
+      "c_KanbanState": "Prioritized"
+    },
+    {
+      "Name": "Sample Story",
+      "ObjectID": 18544838105,
+      "Owner": 2452345234,
+      "_TypeHierarchy": [
+        "PersistableObject",
+        "DomainObject",
+        "WorkspaceDomainObject",
+        "Artifact",
+        "Requirement",
+        "HierarchicalRequirement",
+        "HierarchicalRequirement"
+      ],
+      "_ValidFrom": "2014-04-29T06:03:32.083Z",
+      "_ValidTo": "2014-04-29T06:09:36.010Z",
+      "c_KanbanState": "Prioritized"
+    },
+    {
+      "Name": "Sample Story",
+      "ObjectID": 18544838105,
+      "Owner": 2452345234,
+      "_TypeHierarchy": [
+        "PersistableObject",
+        "DomainObject",
+        "WorkspaceDomainObject",
+        "Artifact",
+        "Requirement",
+        "HierarchicalRequirement",
+        "HierarchicalRequirement"
+      ],
+      "_ValidFrom": "2014-04-29T06:09:36.010Z",
+      "_ValidTo": "2014-04-29T09:08:11.719Z",
+      "c_KanbanState": "In Dev"
+    },
+    {
+      "Name": "Sample Story",
+      "ObjectID": 18544838105,
+      "Owner": 2452345234,
+      "_TypeHierarchy": [
+        "PersistableObject",
+        "DomainObject",
+        "WorkspaceDomainObject",
+        "Artifact",
+        "Requirement",
+        "HierarchicalRequirement",
+        "HierarchicalRequirement"
+      ],
+      "_ValidFrom": "2014-04-29T09:08:11.719Z",
+      "_ValidTo": "9999-01-01T00:00:00.000Z",
+      "c_KanbanState": "Ready for Test"
+    }
+  ],
+  "StartIndex": 0,
+  "ThreadStats": {
+    "blockedCount": "0",
+    "blockedTime": "0",
+    "cpuTime": "70.0",
+    "waitCount": "0",
+    "waitTime": "0"
+  },
+  "Timings": {
+    "TOTAL": 387,
+    "allowedValuesDisambiguation": 1,
+    "allowedValuesHydration": 20,
+    "authorization": 2,
+    "compressSnapshots": 0,
+    "findEtlDate": 53,
+    "formattedId": 0,
+    "mongoQuery": 309,
+    "preProcess": 0,
+    "suppressNonRequested": 2
+  },
+  "TotalResultCount": 90,
+  "Warnings": [],
+  "_rallyAPIMajor": "2",
+  "_rallyAPIMinor": "0"
+}
