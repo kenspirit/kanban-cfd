@@ -65,6 +65,8 @@ app.controller('KanbanCtrl', ['$scope', function($scope) {
     $scope.snapshotDates = snapshotDates;
     $scope.cfdChartConfig.data.rows =
       GoogleChartDataTransformer.transformCFD(cfdSeries);
+
+    $scope.byOwner();
   }
 
   function showCFD() {
