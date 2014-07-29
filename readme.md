@@ -1,6 +1,8 @@
 ## Introduction
 
-This is a lightweight application to build Kanban CFD graph and shows Kanban item detail for analysis. It allows for extracting data from different provider.  Currently it only supports Rally as our company is using it. :P
+[Rally]: https://www.rallydev.com/
+
+This is a lightweight application to build Kanban CFD graph and shows Kanban item detail for analysis. It allows for extracting data from different provider.  Currently it only supports [Rally][] as our company is using it. :P
 
 Below are some sample screens to illustrate its functionalities.
 
