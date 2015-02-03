@@ -101,7 +101,11 @@ function KanbanStorage(dataFileLocation) {
   this.updateItems = function(kanbanItems) {
     var allUpdated = kanbanItems.map(function(item) {
       return itemUpdate({objectID: item.objectID},
-          {$addToSet: {statusChangeLog: {$each: item.statusChangeLog}}},
+          {$addToSet: {
+              statusChangeLog: {$each: item.statusChangeLog},
+              blockLog: {$each: item.blockLog}
+            }
+          },
           {$set: {
               owner: item.owner,
               name: item.name

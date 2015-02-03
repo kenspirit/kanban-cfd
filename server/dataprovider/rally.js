@@ -137,6 +137,12 @@ var KanbanProvider = {
           //     to: ,
           //     status:
           //   }],
+          //   blockLog: [{
+          //      blocked: ,
+          //      stage: ,
+          //      time: ,
+          //      reason:
+          //   }],
           //   kanbanizedOn: // earliest time put to Kanban
           // }
         };
@@ -167,6 +173,7 @@ var KanbanProvider = {
               statusChangeLog: []
             };
             item = itemStatus[snapshot.ObjectID];
+            item.blockLog = [];
           }
 
           item.owner = snapshot.Owner;
@@ -176,6 +183,17 @@ var KanbanProvider = {
             to: snapshot._ValidTo,
             status: snapshot.c_KanbanState
           });
+
+          if (item.blockLog.length === 0 || item.blockLog[item.blockLog.length - 1].blocked != snapshot.Blocked) {
+            item.blockLog.push({
+              blocked: snapshot.Blocked,
+              stage: snapshot.c_KanbanState,
+              time: snapshot._ValidFrom,
+              reason: snapshot.BlockedReason
+            });
+          } else {
+            item.blockLog[item.blockLog.length - 1].reason = snapshot.BlockedReason;
+          }
 
           if (!item.kanbanizedOn || item.kanbanizedOn < snapshot._ValidFrom) {
             item.kanbanizedOn = DateUtil.getDate(snapshot._ValidFrom).toDate();
@@ -199,7 +217,7 @@ var KanbanProvider = {
     findObj._ValidFrom = {'$gte': start.toISOString()};
 
     var fields = ['_ValidFrom', '_ValidTo', 'ObjectID', '_TypeHierarchy',
-      'Name', 'Owner', 'FormattedID', kanbanFieldName],
+      'Name', 'Owner', 'FormattedID', 'Blocked', 'BlockedReason', kanbanFieldName],
         hydrate = ['_TypeHierarchy'];
 
     return restPromise(dataUrl + '?find=' + JSON.stringify(findObj) +
