@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    _ = require('underscore'),
+    _ = require('lodash'),
     sinon = require('sinon'),
     Promise = require('bluebird'),
     config = require('../../config'),
@@ -19,7 +19,7 @@ describe('Rally Snapshot', function() {
     }, {});
 
     var itemFields =
-      ['objectID', 'type', 'statusChangeLog', 'owner', 'name', 'kanbanizedOn'];
+      ['objectID', 'type', 'statusChangeLog', 'owner', 'name', 'kanbanizedOn', 'blockLog'];
 
     // Stub data retrieval method
     var getsnapshotsStub = sinon.stub(rally, 'getRallySnapshot');

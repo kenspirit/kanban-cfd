@@ -23,5 +23,11 @@ module.exports.DateUtil = {
 
     date.set('h', 0).set('m', 0).set('s', 0).set('ms', 0);
     return date;
+  },
+  utc: function(utcString) {
+    return moment.utc(utcString, 'YYYY-MM-DDTHH:mm:ss.SSSSZ', true);
+  },
+  diff: function(src, tgt) {
+    return this.utc(src).diff(this.utc(tgt), 'miliseconds');
   }
 };

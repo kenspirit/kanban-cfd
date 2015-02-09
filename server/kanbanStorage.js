@@ -1,5 +1,5 @@
 var Promise = require('bluebird'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     moment =require('moment-range'),
     config = require('./config'),
     Datastore = require('nedb'),
@@ -99,20 +99,25 @@ function KanbanStorage(dataFileLocation) {
   }
   */
   this.updateItems = function(kanbanItems) {
-    var allUpdated = kanbanItems.map(function(item) {
-      return itemUpdate({objectID: item.objectID},
-          {$addToSet: {
-              statusChangeLog: {$each: item.statusChangeLog},
-              blockLog: {$each: item.blockLog}
+    var allUpdated = kanbanItems.map(
+      function(item) {
+        var setUpdate = {};
+        if (!_.isEmpty(item.statusChangeLog)) {
+          setUpdate['statusChangeLog'] = {$each: item.statusChangeLog};
+        }
+        if (!_.isEmpty(item.blockLog)) {
+          setUpdate['blockLog'] = {$each: item.blockLog};
+        }
+
+        return itemUpdate({objectID: item.objectID},
+            {$addToSet: setUpdate},
+            {$set: {
+                owner: item.owner,
+                name: item.name
+              }
             }
-          },
-          {$set: {
-              owner: item.owner,
-              name: item.name
-            }
-          }
-        );
-    });
+          );
+      });
 
     return Promise.all(allUpdated)
       .then(function(updatedItemCnt) {

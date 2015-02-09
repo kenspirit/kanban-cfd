@@ -1,6 +1,6 @@
 var KanbanStorage = require('../../kanbanStorage'),
     moment = require('moment-range'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     expect = require('chai').expect,
     config = require('../../config'),
     DateUtil = require('../../dateUtil').DateUtil;

@@ -1,6 +1,6 @@
 var Promise = require('bluebird'),
     rest = require('restler'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     config = require('../config'),
     DateUtil = require('../dateUtil').DateUtil;
 

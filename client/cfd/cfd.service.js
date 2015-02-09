@@ -90,6 +90,7 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
       var result = {
         name: item.name,
         type: item.type,
+        blockLog: item.blockLog,
         statusDuration: [], // In hours
         totalDuration: 0 // In hours
       };
@@ -154,6 +155,11 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
       },
       getItemDetailStatusList: function() {
         return kanbanStatusInAscOrder;
+      },
+      filterItemByType: function(itemTypes, items) {
+        return items.filter(function(item) {
+          return itemTypes.indexOf(item.type) > -1;
+        });
       }
     };
   }]);

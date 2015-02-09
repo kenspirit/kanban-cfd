@@ -1,5 +1,6 @@
 var express = require('express'),
     app = express(),
+    _ = require('lodash'),
     http = require('http'),
     server = http.createServer(app),
     io = require('socket.io').listen(server),
@@ -7,6 +8,7 @@ var express = require('express'),
     config = require('./server/config'),
     schedule = require('node-schedule'),
     DateUtil = require('./server/dateUtil').DateUtil,
+    KanbanItemDataMassager = require('./server/kanbanItemDataMassager').KanbanItemDataMassager,
     KanbanStorage = require('./server/kanbanStorage'),
     kanbanProvider = require('./server/dataprovider/' + config.kanbanProvider);
 
@@ -78,6 +80,12 @@ app.get('/itemDetail', function(req, res) {
   kanbanStorage.getItems({
       startDate: startDate,
       endDate: endDate
+    })
+    .then(function(items) {
+      return _.map(items, function(item) {
+        item.blockLog = KanbanItemDataMassager.massageBlockLog(item);
+        return item;
+      });
     })
     .then(responseConstructor.bind(this, res, true))
     .catch(responseConstructor.bind(this, res, false));
