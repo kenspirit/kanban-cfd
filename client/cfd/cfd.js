@@ -4,7 +4,10 @@ var app = angular.module('Kanban', ['ngResource', 'ui.bootstrap',
   // 'googlechart', 'nvd3',
   'nvd3ChartDirectives', 'Kanban.config', 'Kanban.service', 'Kanban.chart']);
 
-app.controller('KanbanCtrl', ['$scope', function($scope) {
+app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
+  'ItemDetailService', 'SnapshotService', 'QueryBuilder', '$q', '$resource',
+    function($scope, SYS_CONFIG, ItemDetailService, SnapshotService, QueryBuilder, $q,
+      $resource) {
 
   $scope.dateFormat = 'yyyy-MM-dd';
   $scope.calendarStatus = {};
@@ -12,7 +15,45 @@ app.controller('KanbanCtrl', ['$scope', function($scope) {
   $scope.startDate = moment().subtract(1, 'months').toDate();
   $scope.endDate = moment().toDate();
 
-  $scope.activeTab = {};
+  $scope.graph = {
+    cfd: [],
+    leadtime: [],
+    blocked: []
+  };
+  $scope.showByOwner = false;
+
+  $scope.kanbanItems = [];
+  $scope.snapshots = [];
+
+  $scope.owners = [{id: 'ALL', name: 'ALL', selected: true}].concat(
+    _.map(SYS_CONFIG.owners, function(ownerName, ownerId) {
+      return {
+        id: ownerId,
+        name: ownerName,
+        selected: true
+      };
+
+      return result;
+    }));
+
+  _.forEach($scope.owners, function(owner, i) {
+    $scope.graph.cfd[i] = true;
+    $scope.graph.leadtime[i] = true;
+    $scope.graph.blocked[i] = true;
+
+    owner.active = i === 0;
+  });
+
+  $scope.itemTypes = _.keys(SYS_CONFIG.kanbanItemTypes)
+    .map(function(type) {
+      return {
+        id: type,
+        name: SYS_CONFIG.kanbanItemTypes[type],
+        selected: true
+      };
+    });
+
+  $scope.itemStatus = ItemDetailService.getItemDetailStatusList();
 
   $scope.openCalendar = function($event, field) {
     $event.preventDefault();
@@ -25,198 +66,150 @@ app.controller('KanbanCtrl', ['$scope', function($scope) {
     $scope.$broadcast('initHistory');
   };
 
-  $scope.refreshGraph = function() {
-    $scope.$broadcast('refresh');
+  $scope.isTabShown = function(owner) {
+    var isShown = owner.selected;
+    if (isShown && owner.id !== 'ALL') {
+      isShown = isShown && $scope.showByOwner;
+    }
+    return isShown;
   };
+
+  $scope.getSelected = function(items) {
+    return _.reduce(items, function(ids, item) {
+      if (item.selected) {
+        ids.push(item.id);
+      }
+      return ids;
+    }, []);
+  }
+
+  $scope.$watch('owners', function(newValue, oldValue) {
+    // Change detected to prevent unexpected change for initial loading time
+    // And the change on "open" attribute which is not needed for refreshing data
+    var selectedOwner = null;
+
+    if (newValue.length === oldValue.length) {
+      selectedOwner = _.find(newValue, function(owner, index) {
+        return owner.selected !== oldValue[index].selected
+          && owner.selected;
+      });
+
+      if (selectedOwner && (selectedOwner.id !== 'ALL' || !$scope.showByOwner)) {
+        selectedOwner = null;
+      }
+    }
+
+    if (selectedOwner != null) {
+      // Only refresh data for the changed & shown owner
+      $scope.$broadcast('refresh', selectedOwner.id, $scope.getSelected($scope.itemTypes));
+    }
+  }, true);
+
+  $scope.$watch('itemTypes', function(newValue/*, oldValue*/) {
+    $scope.$broadcast('refresh', null, $scope.getSelected(newValue));
+  }, true);
+
+  $scope.reloadData = function() {
+    var params = QueryBuilder.getQueryParam($scope);
+
+    var itemPromise = ItemDetailService.loadItems(params),
+        snapshotsPromise = SnapshotService.loadSnaptshots(params);
+
+    $q.all([itemPromise, snapshotsPromise])
+      .then(function(result) {
+        $scope.kanbanItems = result[0];
+        $scope.snapshots = result[1];
+
+        $scope.$broadcast('refresh', null, $scope.itemTypes);
+      });
+  };
+
+  $scope.reloadData();
 
   var socket = io.connect('/');
 
   socket.on('dailyUpdate', function (snapshots) {
     $scope.$broadcast('dailyUpdate', snapshots);
   });
-}])
-.controller('CumulativeFlowDiagramCtrl', ['$scope', '$resource', 'SYS_CONFIG',
-    'QueryBuilder', 'SnapshotService', 'Nvd3ChartBuilder',
-   function($scope, $resource, SYS_CONFIG, QueryBuilder,
-     SnapshotService, Nvd3ChartBuilder) {
-
-  $scope.activeTab.cfd = true;
-
-  $scope.allOwners = _.keys(SYS_CONFIG.owners).map(function(ownerId) {
-    return {
-      id: ownerId,
-      name: SYS_CONFIG.owners[ownerId],
-      open: true
-    };
-  });
-
-  $scope.showByOwner = false;
-  $scope.snapshots = [];
-  $scope.snapshotDates = [];
-
-  Nvd3ChartBuilder.initCFDChartData($scope);
-
-  function buildCFDChart(snapshots, snapshotDates, cfdSeries) {
-    // cfdSeries format:
-    //
-    // {
-    //   2015-01-12: {
-    //     Accepted: 4
-    //     Design: 0
-    //     In Dev: 1
-    //     In Test: 0
-    //     Prioritized: 0
-    //     Ready for Test: 4
-    //     Req: 0
-    //   }
-    // }
-
-    $scope.snapshots = snapshots;
-    $scope.snapshotDates = snapshotDates;
-
-    Nvd3ChartBuilder.loadCFDChartData($scope, cfdSeries);
-    Nvd3ChartBuilder.loadCFDByOwner($scope);
-  }
-
-  function showCFD() {
-    if ($scope.activeTab.cfd) {
-      SnapshotService.loadAndProcessSnapshots(
-        QueryBuilder.getQueryParam($scope), buildCFDChart);
-    }
-  }
-
-  $scope.$on('refresh', showCFD);
 
   $scope.$on('initHistory', function() {
     var HistoricalDataService = $resource('/initHistoricalData', {},
-      {'init':  {method:'POST', isArray:false}});
+      {'init':  {method:'POST', isArray: false}});
 
     HistoricalDataService.init(QueryBuilder.getQueryParam($scope),
-      function(response) {
-        SnapshotService.processSnapshots(response.result || [], buildCFDChart);
+      function() {
+        $scope.reloadData();
       });
   });
 
-  $scope.$on('dailyUpdate', function($event, snapshots) {
-    SnapshotService.processSnapshots(snapshots,
-        function(snapshots, snapshotDates, cfdSeries) {
+  // $scope.$on('dailyUpdate', function($event, snapshots) {
+  //   SnapshotService.processSnapshots(snapshots,
+  //       function(snapshots, cfdSeries) {
 
-      $scope.snapshots.push.apply($scope.snapshots, snapshots);
-      $scope.snapshotDates.push.apply($scope.snapshotDates, snapshotDates);
+  //     $scope.snapshots.push.apply($scope.snapshots, snapshots);
 
-      Nvd3ChartBuilder.loadCFDChartData($scope, cfdSeries);
-      Nvd3ChartBuilder.loadCFDByOwner($scope);
+  //     Nvd3ChartBuilder.loadCFDChartData($scope, cfdSeries);
+  //     Nvd3ChartBuilder.loadCFDByOwner($scope);
 
-      $scope.$apply();
-    });
-  });
-
-  showCFD();
+  //     $scope.$apply();
+  //   });
+  // });
 }])
-.controller('KanbanItemDetailCtrl', ['$scope', 'SYS_CONFIG', 'ItemDetailService',
-    'QueryBuilder',
-  function($scope, SYS_CONFIG, ItemDetailService, QueryBuilder) {
+.controller('CumulativeFlowDiagramCtrl', ['$scope', 'SYS_CONFIG',
+    'QueryBuilder', 'SnapshotService', 'Nvd3ChartBuilder',
+   function($scope, SYS_CONFIG, QueryBuilder, SnapshotService, Nvd3ChartBuilder) {
 
-  $scope.showKanbanCycle = true;
-  $scope.activeTab.item = false;
+  $scope.ownerId = null;
 
-  $scope.needItemDetailGraph = SYS_CONFIG.needItemDetailGraph;
-  $scope.kanbanCycleDuration = SYS_CONFIG.defaultKanbanCycleDuration;
+  Nvd3ChartBuilder.initCFDChartData($scope);
 
-  $scope.kanbanItems = [];
-  $scope.itemTypes = _.keys(SYS_CONFIG.kanbanItemTypes)
-    .map(function(type) {
-      return {
-        id: type,
-        name: SYS_CONFIG.kanbanItemTypes[type],
-        selected: true
-      };
-    });
-  $scope.itemStatus = ItemDetailService.getItemDetailStatusList()
-    .map(function(status) {
-      return {
-        name: status,
-        selected: true
-      };
-    });
-
-  $scope.$watch('itemTypes', function(newValue/*, oldValue*/) {
-    $scope.refreshKanbanItemGraph(newValue, $scope.itemStatus);
-  }, true);
-
-  $scope.$watch('itemStatus', function(newValue/*, oldValue*/) {
-    $scope.refreshKanbanItemGraph($scope.itemTypes, newValue);
-  }, true);
-
-  $scope.$on('refresh', function() {
-    if ($scope.activeTab.item) {
-      $scope.kanbanItems.length = 0;
-      $scope.showKanbanItemGraph();
+  function refreshCFDGraph($event, ownerId, itemTypes) {
+    if (ownerId !== null && ownerId != $scope.ownerId) {
+      return;
     }
+
+    var retainedSnapshots = SnapshotService.filterSnapshot($scope.snapshots,
+      $scope.ownerId, $scope.getSelected(itemTypes));
+
+    Nvd3ChartBuilder.loadCFDChartData($scope,
+      SnapshotService.processSnapshots(retainedSnapshots));
+  }
+
+  $scope.$on('refresh', refreshCFDGraph);
+}])
+.controller('LeadTimeCtrl', ['$scope', 'SYS_CONFIG', 'ItemDetailService', 'Nvd3ChartBuilder',
+  function($scope, SYS_CONFIG, ItemDetailService, Nvd3ChartBuilder) {
+
+  $scope.leadTimeDuration = SYS_CONFIG.defaultLeadTimeDuration;
+  $scope.fromStatus = SYS_CONFIG.defaultLeadTimeStartStatus;
+  $scope.toStatus = SYS_CONFIG.defaultLeadTimeEndStatus;
+  $scope.ownerId = null;
+  $scope.medianLeadTime = 0;
+
+  $scope.$on('refresh', function($event, ownerId, itemTypes) {
+    $scope.refreshLeadTimeGraph(ownerId, $scope.getSelected(itemTypes));
   });
 
-  $scope.showKanbanItemGraph = function() {
-    if (!$scope.kanbanCycleDuration) {
+  Nvd3ChartBuilder.initLeadTimeChartData($scope);
+
+  $scope.onLeadTimeDurationChange = function() {
+    if (!$scope.leadTimeDuration) {
       return; // When the value is removed from input field
     }
 
-    if ($scope.kanbanItems.length === 0) {
-      ItemDetailService.loadItemDetail(
-        QueryBuilder.getQueryParam($scope), function(items) {
-          $scope.kanbanItems = items;
-          $scope.refreshKanbanItemGraph($scope.itemTypes, $scope.itemStatus);
-        });
-    }
-  };
+    $scope.refreshLeadTimeGraph(
+      $scope.ownerId, $scope.getSelected($scope.itemTypes))
+  }
 
-  $scope.refreshKanbanItemGraph = function(itemTypes, itemStatus) {
-    $scope.$broadcast('refreshItem', itemTypes, itemStatus);
-  };
-
-  $scope.getSelectedStatus = function(itemStatus) {
-    return itemStatus.map(function(status) {
-      return status.selected;
-    });
-  };
-
-  $scope.getSelectedStatusName = function(itemStatus) {
-    return itemStatus.reduce(function(retained, status) {
-      if (status.selected) {
-        retained.push(status.name);
-      }
-      return retained;
-    }, []);
-  };
-
-  $scope.getSelectedType = function(itemTypes) {
-    return itemTypes.reduce(function(retained, type) {
-      if (type.selected) {
-        retained.push(type.id);
-      }
-      return retained;
-    }, []);
-  };
-
-}])
-.controller('KanbanCycleCtrl', ['$scope', 'SYS_CONFIG', 'ItemDetailService',
-  'Nvd3ChartBuilder',
-    function($scope, SYS_CONFIG, ItemDetailService, Nvd3ChartBuilder) {
-
-  Nvd3ChartBuilder.initKanbanCycleChartData($scope);
-
-  $scope.$on('refreshItem', function($event, itemTypes, itemStatus) {
-    $scope.refreshKanbanCycleGraph(itemTypes, itemStatus);
-  });
-
-  $scope.refreshKanbanCycleGraph = function(itemTypes, itemStatus) {
-    if (!itemTypes || !itemStatus) {
-      // Initial page loading stage and they are not ready yet
+  $scope.refreshLeadTimeGraph = function(ownerId, itemTypes) {
+    if (ownerId !== null && ownerId !== $scope.ownerId) {
+      // If not refreshing all or selected owner's tab
       return;
     }
 
     function filterItemByDuration(items) {
       return items.filter(function(item) {
-        if (item.totalDuration <= $scope.kanbanCycleDuration * 24) {
+        if (item.totalDuration <= $scope.leadTimeDuration * 24) {
           return false;
         }
 
@@ -228,62 +221,42 @@ app.controller('KanbanCtrl', ['$scope', function($scope) {
       return item2.totalDuration - item1.totalDuration; // sort desc
     }
 
-    function cloneItems(items) {
-      return items.map(function(item) {
-        return {
-          name: item.name,
-          totalDuration: item.totalDuration,
-          type: item.type,
-          statusDuration: item.statusDuration.map(function(dur) {
-            return dur;
-          })
-        };
-      });
-    }
-
-    var retainedStatus = $scope.getSelectedStatus(itemStatus);
-    var itemsRetained = ItemDetailService.filterItemByType(
-      $scope.getSelectedType(itemTypes), $scope.kanbanItems);
-
-    // To remove status duration for those not-shown status
-    // Clone is needed as item's statusDuration will be changed.
-    itemsRetained = cloneItems(itemsRetained);
-
-    itemsRetained.forEach(function(item) {
-      item.statusDuration = item.statusDuration.reduce(
-        function(durations, dur, index) {
-          if (retainedStatus[index]) {
-            durations.push(dur);
-          }
-          return durations;
-        }, []);
-
-      item.totalDuration = item.statusDuration.reduce(function(sum, dur) {
-        return sum + dur;
-      }, 0);
-    });
+    var itemsRetained = ItemDetailService.filterItem($scope.kanbanItems,
+      $scope.ownerId, itemTypes);
 
     itemsRetained = filterItemByDuration(itemsRetained)
       .sort(itemDetailComparator);
 
-    Nvd3ChartBuilder.loadKanbanCycleChartData($scope,
-      $scope.getSelectedStatusName(itemStatus), itemsRetained);
+    Nvd3ChartBuilder.getLeadTimeChartData(
+      $scope, $scope.itemStatus, itemsRetained);
   };
+
 }])
 .controller('BlockedStatisticsCtrl', ['$scope', 'SYS_CONFIG', 'Nvd3ChartBuilder',
   'ItemDetailService',
     function($scope, SYS_CONFIG, Nvd3ChartBuilder, ItemDetailService) {
+
+  $scope.ownerId = null;
   $scope.blockedDuration = SYS_CONFIG.defaultBlockedDuration;
 
   Nvd3ChartBuilder.initBlockedStatisticsChartData($scope);
 
-  $scope.$on('refreshItem', function($event, itemTypes, itemStatus) {
-    $scope.refreshBlockedStatisticsGraph(itemTypes, itemStatus);
+  $scope.$on('refresh', function($event, ownerId, itemTypes) {
+    $scope.refreshBlockedStatisticsGraph(ownerId, $scope.getSelected(itemTypes));
   });
 
-  $scope.refreshBlockedStatisticsGraph = function(itemTypes, itemStatus) {
-    if (!itemTypes || !itemStatus) {
-      // Initial page loading stage and they are not ready yet
+  $scope.onBlockedDurationChange = function() {
+    if (!$scope.blockedDuration) {
+      return; // When the value is removed from input field
+    }
+
+    $scope.refreshBlockedStatisticsGraph(
+      $scope.ownerId, $scope.getSelected($scope.itemTypes))
+  }
+
+  $scope.refreshBlockedStatisticsGraph = function(ownerId, itemTypes) {
+    if (ownerId !== null && ownerId !== $scope.ownerId) {
+      // If not refreshing all or selected owner's tab
       return;
     }
 
@@ -321,16 +294,15 @@ app.controller('KanbanCtrl', ['$scope', function($scope) {
       }, []);
     }
 
-    var retainedStatus = $scope.getSelectedStatusName(itemStatus);
-    var itemsRetained = ItemDetailService.filterItemByType(
-      $scope.getSelectedType(itemTypes), $scope.kanbanItems);
+    var itemsRetained = ItemDetailService.filterItem($scope.kanbanItems,
+      $scope.ownerId, itemTypes);
 
     // Item is cloned with filtered log
     itemsRetained = filterItemBlockLogByStatusAndDuration(itemsRetained,
-      retainedStatus, $scope.blockedDuration);
+      $scope.itemStatus, $scope.blockedDuration);
 
     Nvd3ChartBuilder.loadBlockedStatisticsChartData($scope,
-      $scope.getSelectedStatusName(itemStatus), itemsRetained);
+      $scope.itemStatus, itemsRetained);
   };
 
 }]);

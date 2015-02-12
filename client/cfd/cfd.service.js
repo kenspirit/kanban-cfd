@@ -8,9 +8,18 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
           return moment(date).format(SYS_CONFIG.dateFormat);
         }
 
+        var ownerIds = _.reduce($scope.owners, function(ids, owner) {
+          if (owner.selected) {
+            ids.push(owner.id);
+          }
+
+          return ids;
+        }, []);
+
         return {
           startDate: getDateParam($scope.startDate),
-          endDate: getDateParam($scope.endDate)
+          endDate: getDateParam($scope.endDate),
+          owners: ownerIds
         };
       }
     };
@@ -40,6 +49,19 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
      * @snapshotDates date in array must be in asc order
      */
     function buildSnapshotSeriesByDate(snapshotDates, snapshots) {
+      // cfdSeries format:
+      //
+      // {
+      //   2015-01-12: {
+      //     Accepted: 4
+      //     Design: 0
+      //     In Dev: 1
+      //     In Test: 0
+      //     Prioritized: 0
+      //     Ready for Test: 4
+      //     Req: 0
+      //   }
+      // }
       var seriesByDate = {};
 
       // Initialize each date's status figure
@@ -60,12 +82,7 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
       return seriesByDate;
     }
 
-    function processSnapshots(snapshots, cb) {
-      var snapshotDates = getSnapshotDatesFromSnapshot(snapshots),
-          series = buildSnapshotSeriesByDate(snapshotDates, snapshots);
 
-      cb(snapshots, snapshotDates, series);
-    }
 
     var SnapshotService =
       $resource('/snapshot', {}, {'load':  {method:'GET', isArray: false}});
@@ -73,10 +90,21 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
     return {
       getSnapshotDatesFromSnapshot: getSnapshotDatesFromSnapshot,
       buildSnapshotSeriesByDate: buildSnapshotSeriesByDate,
-      processSnapshots: processSnapshots,
-      loadAndProcessSnapshots: function(query, cb) {
-        SnapshotService.load(query, function(response) {
-          processSnapshots(response.result, cb);
+      processSnapshots: function(snapshots) {
+        var snapshotDates = getSnapshotDatesFromSnapshot(snapshots);
+
+        return buildSnapshotSeriesByDate(snapshotDates, snapshots);
+      },
+      loadSnaptshots: function(query) {
+        return SnapshotService.load(query).$promise
+          .then(function(response) {
+            return response.result;
+          });
+      },
+      filterSnapshot: function(snapshots, owner, itemTypes) {
+        return snapshots.filter(function(snapshot) {
+          return (owner === 'ALL' || snapshot.owner == owner)
+            && itemTypes.indexOf(snapshot.type) > -1;
         });
       }
     };
@@ -90,6 +118,7 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
       var result = {
         name: item.name,
         type: item.type,
+        owner: item.owner,
         blockLog: item.blockLog,
         statusDuration: [], // In hours
         totalDuration: 0 // In hours
@@ -142,23 +171,23 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
       $resource('/itemDetail', {}, {'load':  {method:'GET', isArray: false}});
 
     return {
-      loadItemDetail: function(query, cb) {
-        ItemService.load(query, function(response) {
-          var items = response.result
-            .reduce(function(all, item) {
-              all.push(calculateItemKanbanStatusDuration(item));
-              return all;
-            }, []);
-
-          cb(items);
-        });
+      loadItems: function(query) {
+        return ItemService.load(query).$promise
+          .then(function(response) {
+            return response.result
+              .reduce(function(all, item) {
+                all.push(calculateItemKanbanStatusDuration(item));
+                return all;
+              }, []);
+          });
       },
       getItemDetailStatusList: function() {
         return kanbanStatusInAscOrder;
       },
-      filterItemByType: function(itemTypes, items) {
+      filterItem: function(items, owner, itemTypes) {
         return items.filter(function(item) {
-          return itemTypes.indexOf(item.type) > -1;
+          return (owner === 'ALL' || item.owner == owner)
+            && itemTypes.indexOf(item.type) > -1;
         });
       }
     };

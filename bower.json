@@ -31,7 +31,8 @@
     "d3": "~3.4.13",
     "nvd3": "~1.1.15-beta",
     "angularjs-nvd3-directives": "~0.0.7",
-    "angular-nvd3": "~0.0.9"
+    "angular-nvd3": "~0.0.9",
+    "mathjs": "~1.2.0"
   },
   "devDependencies": {
     "chai": "~1.9.1",

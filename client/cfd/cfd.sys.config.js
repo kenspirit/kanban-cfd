@@ -26,8 +26,9 @@ module.exports = {
     4: 'Lincoln',
     5: 'Jimmy'
   }, // Key is the id used in data provider system.  Value is for display
-  needItemDetailGraph: true, // Requires functionality to show Kanban Item Detail or not
-  defaultKanbanCycleDuration: 5, // Default value for kanban item detail graph filtering,
+  defaultLeadTimeDuration: 5, // Default value for kanban item lead time graph filtering,
+  defaultLeadTimeStartStatus: 'Req', // Start of Lead Time is based on start time of this status
+  defaultLeadTimeEndStatus: 'Ready for Test', // End of Lead Time is based on start time of this status
   defaultBlockedDuration: 1, // Default value for blocked statistics graph filtering,
   ignoreWeekend: true // Whether weekend should be used to count as valid duration.  Impacts schedule job as well.
 };

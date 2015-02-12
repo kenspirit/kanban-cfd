@@ -217,7 +217,7 @@ function KanbanStorage(dataFileLocation) {
     kanbanizedOn:
   }
   */
-  this.initHistoricalData = function(kanbanItems, startDate, needItemDetailGraph) {
+  this.initHistoricalData = function(kanbanItems, startDate) {
 
     function extractItemID(item) {
       return item.objectID;
@@ -312,10 +312,6 @@ function KanbanStorage(dataFileLocation) {
 
         return that.saveSnapshot(allSnapshots);
       });
-
-    if (!needItemDetailGraph) {
-      return snapshotPromise;
-    }
 
     return itemFind({objectID: {$in: allItemIDs}})
       .then(function(items) {

@@ -48,15 +48,10 @@ app.post('/initHistoricalData', function(req, res) {
 
   kanbanProvider.getHistoricalKanbanStatus(startDate)
     .then(function(kanbanItems) {
-      return kanbanStorage.initHistoricalData(kanbanItems, startDate,
-        config.needItemDetailGraph);
+      return kanbanStorage.initHistoricalData(kanbanItems, startDate);
     })
     .then(function(result) {
-      if (config.needItemDetailGraph) {
-        responseConstructor(res, true, result.snapshots);
-      } else {
-        responseConstructor(res, true, result);
-      }
+      responseConstructor(res, true, result.snapshots);
     })
     .catch(responseConstructor.bind(this, res, false));
 });
@@ -106,34 +101,21 @@ rule.hour = [config.dataCollectTime];
 rule.minute = 0;
 
 schedule.scheduleJob(rule, function() {
-  if (config.needItemDetailGraph) {
-    // Only need to capture the change happen today as it is supposed that
-    // previous item detail has described the Kanban status correctly.
-    kanbanProvider.getHistoricalKanbanStatus()
-      .then(function(kanbanItems) {
-        return kanbanStorage.initHistoricalData(
-          kanbanItems, DateUtil.getDate(), true);
-      })
-      .then(function(result) {
-        statusEmitter.emit('dailyUpdate', result.snapshots);
-        return result;
-      })
-      .catch(function(e) {
-        console.log('Daily capture failed.');
-        console.log(e);
-      });
-  } else {
-    kanbanProvider.itemSnapshotNow()
-      .then(kanbanStorage.saveSnapshot)
-      .then(function(snapshots) {
-        statusEmitter.emit('dailyUpdate', snapshots);
-        return snapshots;
-      })
-      .catch(function(e) {
-        console.log('Daily capture failed.');
-        console.log(e);
-      });
-  }
+  // Only need to capture the change happen today as it is supposed that
+  // previous item detail has described the Kanban status correctly.
+  kanbanProvider.getHistoricalKanbanStatus()
+    .then(function(kanbanItems) {
+      return kanbanStorage.initHistoricalData(
+        kanbanItems, DateUtil.getDate(), true);
+    })
+    .then(function(result) {
+      statusEmitter.emit('dailyUpdate', result.snapshots);
+      return result;
+    })
+    .catch(function(e) {
+      console.log('Daily capture failed.');
+      console.log(e);
+    });
 });
 
 io.sockets.on('connection', function(socket) {
