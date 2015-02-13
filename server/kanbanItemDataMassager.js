@@ -81,6 +81,12 @@ module.exports.KanbanItemDataMassager = {
       }
     });
 
+    if (blockedStage) {
+      // Means item's latest status is still blocked
+      completeBlockedRecord(massagedLogs, blockedStage, blockedStart,
+        DateUtil.nowInUTCString(), blockedReason);
+    }
+
     return massagedLogs;
   }
 };

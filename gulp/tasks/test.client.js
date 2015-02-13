@@ -11,7 +11,7 @@ module.exports = function () {
       'bower_components/angular-resource/angular-resource.min.js',
       'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'bower_components/momentjs/min/moment.min.js',
-      'bower_components/underscore/underscore.js',
+      'bower_components/lodash/dist/lodash.min.js',
       'bower_components/chai/chai.js',
       'bower_components/mocha/mocha.js',
       'bower_components/angular-google-chart/ng-google-chart.js',

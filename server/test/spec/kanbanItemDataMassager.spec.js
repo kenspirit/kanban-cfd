@@ -15,5 +15,7 @@ describe('Item Data Massage', function() {
     it('Item with empty blockLog element.', verify.bind(this, 'empty'));
 
     it('Starting with non-blocking record', verify.bind(this, 'startWithNonBlocked'));
+
+    it('Ending with blocking record', verify.bind(this, 'endWithBlocked'));
   });
 });

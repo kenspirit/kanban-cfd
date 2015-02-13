@@ -29,5 +29,8 @@ module.exports.DateUtil = {
   },
   diff: function(src, tgt) {
     return this.utc(src).diff(this.utc(tgt), 'miliseconds');
+  },
+  nowInUTCString: function() {
+    return moment.utc().format('YYYY-MM-DDTHH:mm:ss.0000Z');
   }
 };
