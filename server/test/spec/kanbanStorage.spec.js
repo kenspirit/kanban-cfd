@@ -347,49 +347,6 @@ describe('Snapshot construction', function() {
           .clone().add(1, 'day'),
         snapshots2 = storage.convertItemDetailToSnapshot(itemData, dateAfterEarliest);
 
-    it('Without capturing item detail', function(done) {
-      storage.initHistoricalData(itemData, startDate, false)
-        .then(function(snapshots) {
-          // Step 1: Load all item snapshot because the startDate is earlier than
-          // snapshot earliest date.
-
-          // Snapshot data inserted is the same as the converted ones
-          deepCompare(snapshots, snapshots1, snapshotComparator);
-          return snapshots;
-        })
-        .then(function(fullSnapshots) {
-          // Step 2: re-init the historical data by resetting the startDate
-          // to be later than earliest snapshot date
-          return storage.initHistoricalData(itemData, dateAfterEarliest, false)
-            .then(function(snapshots) {
-              // Snapshot data inserted is the same as the converted ones
-              deepCompare(snapshots, snapshots2, snapshotComparator);
-
-              // Re-init snapshot data count should be same as full snapshot length
-              // minus the count of the snapshot on earliest date
-              expect(snapshots.length).to.equal(
-                fullSnapshots.length - earliestDateAndCnt.cnt);
-              return storage.getSnapshot({});
-            })
-            .then(function(dbSnapshots) {
-              // After Step 2: the DB snapshot total records should be same as
-              // the snapshot total records generated in Step 1.
-              // deepCompare(dbSnapshots, fullSnapshots, snapshotComparator);
-              expect(dbSnapshots.length).to.equal(fullSnapshots.length);
-              return true;
-            });
-        })
-        .then(function() {
-          // Step 3: there is no item detail records as it's not enabled.
-          return storage.getItems({})
-            .then(function(items) {
-              expect(items.length).to.equal(0); // No item detail is captured in DB
-              done();
-            });
-        })
-        .catch(done);
-    });
-
     it('With capturing item detail', function(done) {
       function itemComparator(s1, s2) {
         if (s1.objectID < s2.objectID) {
@@ -400,7 +357,7 @@ describe('Snapshot construction', function() {
         return 0;
       }
 
-      storage.initHistoricalData(itemData, startDate, true)
+      storage.initHistoricalData(itemData, startDate)
         .then(function(result) {
           // Result should be in such format:
           // {
@@ -408,8 +365,8 @@ describe('Snapshot construction', function() {
           //   newItems:
           //   snapshots:
           // }
-          expect(['updatedItemCnt', 'newItems', 'snapshots']).to.have.members(
-            _.keys(result));
+          expect(['updatedItemCnt', 'newItems', 'updatedItems', 'snapshots'])
+            .to.have.members(_.keys(result));
 
           // Step 1: Load all item snapshot because the startDate is earlier than
           // snapshot earliest date.
@@ -429,7 +386,7 @@ describe('Snapshot construction', function() {
 
           return storage.removeItems({objectID: itemToRemove.objectID})
             .then(function() {
-              storage.initHistoricalData(itemData, startDate, true)
+              storage.initHistoricalData(itemData, startDate)
                 .then(function(result) {
                   // Step 2: Load all item snapshot because the startDate is earlier than
                   // snapshot earliest date.
@@ -453,8 +410,8 @@ describe('Snapshot construction', function() {
 
     it('Re-init new items can accumulate previous snapshots', function(done) {
 
-      storage.initHistoricalData(itemData, '2014-04-20', false)
-        .then(function(snapshots) {
+      storage.initHistoricalData(itemData, '2014-04-20')
+        .then(function(result) {
           // 2014-05-05 is the last day that all sample item in kanbanItems.json
           // having the latest update.  That means snapshots after 2014-05-05
           // for those items should be the same as that day and should be used
@@ -490,11 +447,11 @@ describe('Snapshot construction', function() {
                 return result;
               }
 
-              storage.initHistoricalData(newItem, laterDate, false)
-                .then(function(allSnapshots) {
+              storage.initHistoricalData(newItem, laterDate)
+                .then(function(allResult) {
 
-                  expect(getSnapshotOn(allSnapshots).length).to.equal(
-                    getSnapshotOn(snapshots).length +
+                  expect(getSnapshotOn(allResult.snapshots).length).to.equal(
+                    getSnapshotOn(result.snapshots).length +
                     getSnapshotOn(newItemSnapshots).length);
 
                   done();

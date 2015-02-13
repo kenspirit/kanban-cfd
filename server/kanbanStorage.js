@@ -327,12 +327,14 @@ function KanbanStorage(dataFileLocation) {
           .all([
             that.updateItems(existedItems),
             itemInsert(newItems),
+            existedItems,
             snapshotPromise
           ])
-          .spread(function(updatedItemCnt, newItems, snapshots) {
+          .spread(function(updatedItemCnt, newItems, existedItems, snapshots) {
             return {
               updatedItemCnt: updatedItemCnt,
               newItems: newItems,
+              updatedItems: existedItems,
               snapshots: snapshots
             };
           });

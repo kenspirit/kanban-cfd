@@ -50,7 +50,7 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
           var tips = '<div>' + x + '</div>' +
             key + ': <span style="font-weight: bold"> ' + y + '</span>';
           if (e.point[2]) {
-            tips += ' Blocked <span style="font-weight: bold">'
+            tips += ' Blocked <span style="font-weight: bold; color: red">'
               + (e.point[2] / (24.0 * 3600 * 1000)).toFixed(1)
               + '</span> days for reason: ' + e.point[3];
           }

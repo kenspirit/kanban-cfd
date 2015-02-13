@@ -51,7 +51,7 @@ app.post('/initHistoricalData', function(req, res) {
       return kanbanStorage.initHistoricalData(kanbanItems, startDate);
     })
     .then(function(result) {
-      responseConstructor(res, true, result.snapshots);
+      responseConstructor(res, true, result);
     })
     .catch(responseConstructor.bind(this, res, false));
 });
@@ -105,11 +105,10 @@ schedule.scheduleJob(rule, function() {
   // previous item detail has described the Kanban status correctly.
   kanbanProvider.getHistoricalKanbanStatus()
     .then(function(kanbanItems) {
-      return kanbanStorage.initHistoricalData(
-        kanbanItems, DateUtil.getDate(), true);
+      return kanbanStorage.initHistoricalData(kanbanItems, DateUtil.getDate());
     })
     .then(function(result) {
-      statusEmitter.emit('dailyUpdate', result.snapshots);
+      statusEmitter.emit('dailyUpdate', result);
       return result;
     })
     .catch(function(e) {

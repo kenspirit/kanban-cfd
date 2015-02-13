@@ -63,7 +63,13 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   };
 
   $scope.initHistoricalData = function() {
-    $scope.$broadcast('initHistory');
+    var HistoricalDataService = $resource('/initHistoricalData', {},
+      {'init':  {method:'POST', isArray: false}});
+
+    HistoricalDataService.init(QueryBuilder.getQueryParam($scope),
+      function() {
+        $scope.reloadData();
+      });
   };
 
   $scope.isTabShown = function(owner) {
@@ -126,33 +132,12 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
 
   $scope.reloadData();
 
-  var socket = io.connect('/');
+  // var socket = io.connect('/');
 
-  socket.on('dailyUpdate', function (snapshots) {
-    $scope.$broadcast('dailyUpdate', snapshots);
-  });
+  // socket.on('dailyUpdate', function (result) {
+  //   $scope.snapshots.push.apply($scope.snapshots, result.snapshots);
 
-  $scope.$on('initHistory', function() {
-    var HistoricalDataService = $resource('/initHistoricalData', {},
-      {'init':  {method:'POST', isArray: false}});
-
-    HistoricalDataService.init(QueryBuilder.getQueryParam($scope),
-      function() {
-        $scope.reloadData();
-      });
-  });
-
-  // $scope.$on('dailyUpdate', function($event, snapshots) {
-  //   SnapshotService.processSnapshots(snapshots,
-  //       function(snapshots, cfdSeries) {
-
-  //     $scope.snapshots.push.apply($scope.snapshots, snapshots);
-
-  //     Nvd3ChartBuilder.loadCFDChartData($scope, cfdSeries);
-  //     Nvd3ChartBuilder.loadCFDByOwner($scope);
-
-  //     $scope.$apply();
-  //   });
+  //   $scope.$broadcast('refresh', null, $scope.getSelected($scope.itemTypes));
   // });
 }])
 .controller('CumulativeFlowDiagramCtrl', ['$scope', 'SYS_CONFIG',
