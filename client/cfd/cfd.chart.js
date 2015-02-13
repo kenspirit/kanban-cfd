@@ -46,9 +46,15 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
       initLeadTimeChartData: function($scope) {
         $scope.leadTimeData = [];
 
-        $scope.toolTipContentFunction = function(key, x, y/*, e, graph*/) {
-          return '<div>' + x + '</div>' +
+        $scope.toolTipContentFunction = function(key, x, y, e/*, graph*/) {
+          var tips = '<div>' + x + '</div>' +
             key + ': <span style="font-weight: bold"> ' + y + '</span>';
+          if (e.point[2]) {
+            tips += ' Blocked <span style="font-weight: bold">'
+              + (e.point[2] / (24.0 * 3600 * 1000)).toFixed(1)
+              + '</span> days for reason: ' + e.point[3];
+          }
+          return tips;
         };
       },
 
@@ -56,17 +62,24 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
         var itemLeadTime = [];
 
         for (var i = 0; i < displayStatus.length; i++) {
-          var data = {
-            key: displayStatus[i],
-            values: []
-          };
+          var status = displayStatus[i],
+              data = {
+                key: status,
+                values: []
+              };
 
           for (var j = 0; j < itemDetails.length; j++) {
             var item = itemDetails[j],
                 // durationInHour = (item.statusDuration[i] / 24.0).toFixed(1);
-                durationInHour = item.statusDuration[i] / 24.0;
+                durationInHour = item.statusDuration[i] / 24.0,
+                result = [item.name, durationInHour];
 
-            data.values.push([item.name, durationInHour]);
+            if (!_.isEmpty(item.blockLog) && !_.isEmpty(item.blockLog[status])) {
+              var blocked = item.blockLog[status];
+              result.push(blocked[0]);
+              result.push(blocked[1] ? blocked[1] : 'None');
+            }
+            data.values.push(result);
           }
           itemLeadTime.push(data);
         }
@@ -93,8 +106,7 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
         //   Prioritized: [ 43200000, 'Priority shifted' ]
         // }
 
-        var statusBlockedStatistics = {},
-            itemBlockedStatistics = [];
+        var statusBlockedStatistics = {};
 
         _.forEach(itemDetails, function(item) {
           if (_.isEmpty(item.blockLog)) {
@@ -117,27 +129,6 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
             }
             statusBlockedStatistics[reason][blockStatus] += item.blockLog[blockStatus][0];
           });
-
-          _.forEach(displayStatus, function(status, index) {
-            if (itemBlockedStatistics.length === index) {
-              // Statistics for this status not initialized yet
-              itemBlockedStatistics[index] = {
-                key: status,
-                values: []
-              };
-            }
-
-            var blockStatus = [item.name.substring(0, item.name.indexOf(':'))];
-            if (!item.blockLog[status]) {
-              blockStatus.push(0);
-              blockStatus.push('None');
-            } else {
-              blockStatus.push(item.blockLog[status][0]);
-              blockStatus.push(item.blockLog[status][1] ? item.blockLog[status][1] : 'None');
-            }
-
-            itemBlockedStatistics[index].values.push(blockStatus);
-          });
         });
 
         statusBlockedStatistics = _.map(_.keys(statusBlockedStatistics), function(reason) {
@@ -156,7 +147,6 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
         });
 
         $scope.statusBlockedStatistics = statusBlockedStatistics;
-        $scope.itemBlockedStatistics = itemBlockedStatistics;
       }
     };
   }]);

@@ -240,7 +240,8 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
         var cloneItem = {
           name: item.name,
           statusDuration: [],
-          totalDuration: 0
+          totalDuration: 0,
+          blockLog: item.blockLog
         };
 
         _.forEach(item.statusDuration, function(duration, index) {
