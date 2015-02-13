@@ -190,6 +190,14 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     $scope.refreshLeadTimeGraph(ownerId, $scope.getSelected(itemTypes));
   });
 
+  $scope.$watch('fromStatus', function(newValue/*, oldValue*/) {
+    $scope.refreshLeadTimeGraph($scope.ownerId, $scope.getSelected($scope.itemTypes));
+  }, true);
+
+  $scope.$watch('toStatus', function(newValue/*, oldValue*/) {
+    $scope.refreshLeadTimeGraph($scope.ownerId, $scope.getSelected($scope.itemTypes));
+  }, true);
+
   Nvd3ChartBuilder.initLeadTimeChartData($scope);
 
   $scope.onLeadTimeDurationChange = function() {
@@ -207,14 +215,47 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
       return;
     }
 
-    function filterItemByDuration(items) {
-      return items.filter(function(item) {
-        if (item.totalDuration <= $scope.leadTimeDuration * 24) {
-          return false;
+    var fromStatusIdx = $scope.itemStatus.indexOf($scope.fromStatus),
+        toStatusIdx = $scope.itemStatus.indexOf($scope.toStatus),
+        statusList = [];
+
+    if (fromStatusIdx > toStatusIdx) {
+      var tmp = fromStatusIdx;
+      toStatusIdx = fromStatusIdx;
+      fromStatusIdx = toStatusIdx;
+    }
+
+    function filterStatus(fromStatusIdx, toStatusIdx) {
+      return _.filter($scope.itemStatus, function(status, index) {
+        return fromStatusIdx <= index && index <= toStatusIdx;
+      });
+    }
+
+    function filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, items) {
+      return _.reduce(items, function(retainedItems, item) {
+        if (_.isEmpty(item.statusDuration)) {
+          return retainedItems;
         }
 
-        return true;
-      });
+        var cloneItem = {
+          name: item.name,
+          statusDuration: [],
+          totalDuration: 0
+        };
+
+        _.forEach(item.statusDuration, function(duration, index) {
+          if (index >= fromStatusIdx && index <= toStatusIdx) {
+            cloneItem.statusDuration.push(duration);
+            cloneItem.totalDuration += duration;
+          }
+        });
+
+        if (cloneItem.totalDuration > $scope.leadTimeDuration * 24) {
+          retainedItems.push(cloneItem);
+        }
+
+        return retainedItems;
+      }, []);
     }
 
     function itemDetailComparator(item1, item2) {
@@ -224,11 +265,18 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     var itemsRetained = ItemDetailService.filterItem($scope.kanbanItems,
       $scope.ownerId, itemTypes);
 
-    itemsRetained = filterItemByDuration(itemsRetained)
+    if (!_.isEmpty(itemsRetained)) {
+      $scope.medianLeadTime = (math.median(_.pluck(itemsRetained, 'totalDuration')) / 24.0)
+        .toFixed(1);
+    } else {
+      $scope.medianLeadTime = 0;
+    }
+
+    itemsRetained = filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, itemsRetained)
       .sort(itemDetailComparator);
 
-    Nvd3ChartBuilder.getLeadTimeChartData(
-      $scope, $scope.itemStatus, itemsRetained);
+    Nvd3ChartBuilder.getLeadTimeChartData($scope,
+      filterStatus(fromStatusIdx, toStatusIdx), itemsRetained);
   };
 
 }])

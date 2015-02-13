@@ -20,11 +20,10 @@ module.exports = {
     'Prioritized'
   ], // sequence matters for CFD calculation.  Earlier stage is put at the end
   owners: {
-    1: 'Ken',
-    2: 'Winnie',
-    3: 'Sam',
-    4: 'Lincoln',
-    5: 'Jimmy'
+    4697704218: 'ken.chen@oocl.com',
+    7111846346: 'leo.x.liu@oocl.com',
+    6549512547: 'johnson.s.zhang@oocl.com',
+    7111845788: 'doris.zhang@oocl.com'
   }, // Key is the id used in data provider system.  Value is for display
   defaultLeadTimeDuration: 5, // Default value for kanban item lead time graph filtering,
   defaultLeadTimeStartStatus: 'Req', // Start of Lead Time is based on start time of this status
