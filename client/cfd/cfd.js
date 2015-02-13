@@ -120,7 +120,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
         $scope.kanbanItems = result[0];
         $scope.snapshots = result[1];
 
-        $scope.$broadcast('refresh', null, $scope.itemTypes);
+        $scope.$broadcast('refresh', null, $scope.getSelected($scope.itemTypes));
       });
   };
 
@@ -169,7 +169,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     }
 
     var retainedSnapshots = SnapshotService.filterSnapshot($scope.snapshots,
-      $scope.ownerId, $scope.getSelected(itemTypes));
+      $scope.ownerId, itemTypes);
 
     Nvd3ChartBuilder.loadCFDChartData($scope,
       SnapshotService.processSnapshots(retainedSnapshots));
@@ -187,7 +187,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   $scope.medianLeadTime = 0;
 
   $scope.$on('refresh', function($event, ownerId, itemTypes) {
-    $scope.refreshLeadTimeGraph(ownerId, $scope.getSelected(itemTypes));
+    $scope.refreshLeadTimeGraph(ownerId, itemTypes);
   });
 
   $scope.$watch('fromStatus', function(newValue/*, oldValue*/) {
@@ -291,7 +291,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   Nvd3ChartBuilder.initBlockedStatisticsChartData($scope);
 
   $scope.$on('refresh', function($event, ownerId, itemTypes) {
-    $scope.refreshBlockedStatisticsGraph(ownerId, $scope.getSelected(itemTypes));
+    $scope.refreshBlockedStatisticsGraph(ownerId, itemTypes);
   });
 
   $scope.onBlockedDurationChange = function() {
