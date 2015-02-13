@@ -265,15 +265,15 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     var itemsRetained = ItemDetailService.filterItem($scope.kanbanItems,
       $scope.ownerId, itemTypes);
 
+    itemsRetained = filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, itemsRetained)
+      .sort(itemDetailComparator);
+
     if (!_.isEmpty(itemsRetained)) {
       $scope.medianLeadTime = (math.median(_.pluck(itemsRetained, 'totalDuration')) / 24.0)
         .toFixed(1);
     } else {
       $scope.medianLeadTime = 0;
     }
-
-    itemsRetained = filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, itemsRetained)
-      .sort(itemDetailComparator);
 
     Nvd3ChartBuilder.getLeadTimeChartData($scope,
       filterStatus(fromStatusIdx, toStatusIdx), itemsRetained);
