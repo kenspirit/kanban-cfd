@@ -4,27 +4,33 @@
 
 This is a lightweight application to build Kanban CFD graph and shows Kanban item detail for analysis. It allows for extracting data from different provider.  Currently it only supports [Rally][] as our company is using it. :P
 
+The graph is by designed to allow showing data grouping by different owner in different tab.  The intention is to allow each owner to compare their graph to the overall or other owners' statistics to see where they can see the problem from.  I think this encourage each owner to see same graph with different insight.
+
 Below are some sample screens to illustrate its functionalities.
 
-### Overall Cumulative Flow Diagram
+### Cumulative Flow Diagram
 
-![Overall CFD](./overall.png)
+![Cumulative Flow Diagram](./CFD.png)
 
-### Cumulative Flow Diagram by item owner
+### Item Lead Time
 
-![CFD by Owner](./byOwner.png)
+Shows item lead time by specifying the Start and End stage you defined in Kanban system with Median and Mean lead time calculated.  You can further filter the items to show based on a lead time threshold.
 
-### Kanban Item Detail
+When you mouse over an item, it will further tell how long it spends on one stage and even how long it's blocked for any particular reason.
 
-Supports item type, status and overall duration filtering.
+![Item Lead Time](./Item_Leadtime.png)
 
-![Kanban Item Detail](./itemDetail.png)
+### Blocked Statistics
+
+This graph is showing blocked statistics grouped by Kanban stage and blocked reason.  In order to not blowing the graph, the blocked reason is probably best to limit to particular category, say Priority Switched, Prod Support, Resource Limited, Env Down, etc.
+
+![Blocked Statistics](./Blocked_Statistics.png)
 
 *Note:*
 
-1. Button *"Load historical data starting from"* only takes a parameter of start date in fisrt time initialization.  It loads snapshot from that day to today.
+1. Button *"Load historical data starting from"* only takes start date for initialization.  It loads item detail & snapshot from that day to today.
 
-2. Button *"Refresh grapth"* only refresh graph (CFD / Item Detail) in current visible tab.
+2. Button *"Reload Data"* refresh graphs based on the start & end date from the data loaded before.
 
 
 ## Mechanism & Configuration
@@ -38,7 +44,7 @@ This application runs a schedule job at configrable time daily to capture a snap
 ### Configuration
 File `server\config.js` presents all of the configrable options which is data provider independent.
 
-Most of them should be strangeforward as comment is provided.
+All of them should be straightforward as comment is provided.
 
 
 ## Data Provider
@@ -61,10 +67,9 @@ var kanbanFieldName = 'c_KanbanState'; // Your Kanban customized field name
 
 You have to write a customized data provider class yourself.
 
-The data provider should contain below two API only:
+The data provider only need to provide below API:
 
 * getHistoricalKanbanStatus
-* itemSnapshotNow
 
 _getHistoricalKanbanStatus_ is called when you want to extract data from your system to this app.  It should normally be called once as later it will have schedule job to do the work for you.
 
@@ -81,22 +86,13 @@ It expects to have a single date string input.  Its output expects to be a Promi
     to: , // from & to value should be ISO format date string
     status: // Kanban status name matches the kanbanStatusNames
   }], // List of object describes the Kanban status period
+  blockLog: [{
+    blocked: , // true or false to indicate it's blocked or not
+    stage: , // At what Kanban stage it is blocked
+    time: , // the time at which it's marked as blocked or unblocked
+    reason: // blocked reason
+  }],
   kanbanizedOn: // Earliest time this item is in Kanban System
-}
-```
-
-_itemSnapshotNow_ is called by daily schedule job.
-
-It expects no input parameter.  Its output expects to be a Promise which resolves to be an array of below object whose fields are quite similar as above:
-
-```javascript
-{
-  objectID: ,
-  type: ,
-  owner: ,
-  status: ,
-  date: now, // A JS Date object at the time schedule job is run
-  name:
 }
 ```
 

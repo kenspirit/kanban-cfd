@@ -1,6 +1,6 @@
 {
   "name": "kanban-cfd",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Kanban CFD Visualization",
   "main": "index.js",
   "keywords": [
@@ -14,7 +14,7 @@
   "dependencies": {
     "bluebird": "0.10.14-0",
     "express": "^3.5.1",
-    "lodash": "^3.1.0",
+    "lodash": "^3.2.0",
     "moment": "^2.5.1",
     "moment-range": "^1.0.1",
     "nedb": "^0.10.5",

@@ -170,6 +170,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   $scope.toStatus = SYS_CONFIG.defaultLeadTimeEndStatus;
   $scope.ownerId = null;
   $scope.medianLeadTime = 0;
+  $scope.meanLeadTime = 0;
 
   $scope.$on('refresh', function($event, ownerId, itemTypes) {
     $scope.refreshLeadTimeGraph(ownerId, itemTypes);
@@ -216,7 +217,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
       });
     }
 
-    function filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, items) {
+    function filterItemStatus(fromStatusIdx, toStatusIdx, items) {
       return _.reduce(items, function(retainedItems, item) {
         if (_.isEmpty(item.statusDuration)) {
           return retainedItems;
@@ -236,12 +237,16 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
           }
         });
 
-        if (cloneItem.totalDuration > $scope.leadTimeDuration * 24) {
-          retainedItems.push(cloneItem);
-        }
+        retainedItems.push(cloneItem);
 
         return retainedItems;
       }, []);
+    }
+
+    function filterItemByDuration(items) {
+      return _.filter(items, function(item) {
+        return item.totalDuration >= $scope.leadTimeDuration * 24;
+      });
     }
 
     function itemDetailComparator(item1, item2) {
@@ -251,15 +256,21 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     var itemsRetained = ItemDetailService.filterItem($scope.kanbanItems,
       $scope.ownerId, itemTypes);
 
-    itemsRetained = filterItemStatusAndByDuration(fromStatusIdx, toStatusIdx, itemsRetained)
-      .sort(itemDetailComparator);
+    itemsRetained = filterItemStatus(fromStatusIdx, toStatusIdx, itemsRetained);
 
     if (!_.isEmpty(itemsRetained)) {
-      $scope.medianLeadTime = (math.median(_.pluck(itemsRetained, 'totalDuration')) / 24.0)
-        .toFixed(1);
+      var totalDuration = _.pluck(itemsRetained, 'totalDuration');
+
+      $scope.meanLeadTime = (math.mean(totalDuration) / 24.0).toFixed(1);
+      $scope.medianLeadTime = (math.median(totalDuration) / 24.0).toFixed(1);
     } else {
+      $scope.meanLeadTime = 0;
       $scope.medianLeadTime = 0;
     }
+
+    // filtering by duration must be after mean & median calculation
+    itemsRetained = filterItemByDuration(itemsRetained)
+      .sort(itemDetailComparator);
 
     Nvd3ChartBuilder.getLeadTimeChartData($scope,
       filterStatus(fromStatusIdx, toStatusIdx), itemsRetained);

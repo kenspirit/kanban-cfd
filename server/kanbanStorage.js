@@ -95,6 +95,12 @@ function KanbanStorage(dataFileLocation) {
       to: ,
       status:
     }],
+    blockLog: [{
+      blocked: ,
+      stage: ,
+      time: ,
+      reason:
+    }],
     kanbanizedOn:
   }
   */
@@ -213,6 +219,12 @@ function KanbanStorage(dataFileLocation) {
       from: , // expected format is '2014-01-27T02:17:13.527Z'
       to: ,
       status:
+    }],
+    blockLog: [{
+      blocked: ,
+      stage: ,
+      time: ,
+      reason:
     }],
     kanbanizedOn:
   }
