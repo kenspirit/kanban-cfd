@@ -77,7 +77,7 @@ var KanbanProvider = {
 
     var url =
       'https://rally1.rallydev.com/slm/webservice/v2.0/' + itemType;
-    var userSubquery = buildInQuery('Owner.Name', _.values(config.owners));
+    var userSubquery = buildInQuery('Owner.ObjectID', _.values(config.owners));
     var kanbanSubQuery = buildInQuery(kanbanFieldName, config.kanbanStatusNames);
 
     url += '?query=(' + userSubquery + ' AND ' + kanbanSubQuery +
