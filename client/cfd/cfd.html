@@ -71,6 +71,12 @@
       <accordion close-others="false" style="width: 100%;">
         <accordion-group heading="Cumulative Flow" is-open="graph.cfd[$index]" style="max-height: 350">
           <div ng-controller="CumulativeFlowDiagramCtrl" ng-init="ownerId = owner.id">
+            <div>
+              <span style="font-weight: bold">Increased</span>
+              <span ng-repeat="type in itemTypeCount">
+                <span style="font-weight: bold"> {{type.name}}</span><span>: {{type.endCount}} - {{type.startCount}} = {{type.endCount - type.startCount}}; </span>
+              </span>
+            </div>
             <nvd3-stacked-area-chart
                 data="cfdData"
                 width="1280"
@@ -94,6 +100,9 @@
                   <input type="text" style="width: 40px" ng-model="leadTimeDuration" placeholder="days" ng-change="onLeadTimeDurationChange()" ng-required="true"/>
                 </div>
                 <div class="form-group col-md-1">
+                </div>
+                <div class="form-group col-md-1">
+                  <span>Total: {{totalTime}}</span>
                 </div>
                 <div class="form-group col-md-1">
                   <span>Mean: {{meanLeadTime}}</span>

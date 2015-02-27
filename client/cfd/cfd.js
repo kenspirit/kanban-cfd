@@ -153,11 +153,54 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
       return;
     }
 
+    $scope.itemTypeCount = _.reduce(itemTypes, function(itemTypeCount, type) {
+      var name = _.result(_.find($scope.itemTypes, {id: type}), 'name');
+
+      itemTypeCount[type] = {
+        name: name,
+        startCount: 0,
+        endCount: 0
+      };
+
+      return itemTypeCount;
+    }, {});
+
     var retainedSnapshots = SnapshotService.filterSnapshot($scope.snapshots,
       $scope.ownerId, itemTypes);
+    retainedSnapshots = _.sortBy(retainedSnapshots, 'date');
+
+    var snapshotsDates = SnapshotService.getSnapshotDatesFromSnapshot(retainedSnapshots);
+
+    if (snapshotsDates.length > 0) {
+      var startDate = snapshotsDates[0],
+          endDate = snapshotsDates[snapshotsDates.length - 1];
+
+      _.forEach($scope.itemTypeCount, function(type) {
+        type.startCount = 0;
+        type.endCount = 0;
+      });
+
+      for (var i = 0; i < retainedSnapshots.length; i++) {
+        var snapshot = retainedSnapshots[i],
+            snapshotDate = SnapshotService.getSnapshotDate(snapshot);
+        if (snapshotDate !== startDate) {
+          break;
+        }
+        $scope.itemTypeCount[snapshot.type].startCount++;
+      }
+
+      for (var i = retainedSnapshots.length - 1; i > -1; i--) {
+        var snapshot = retainedSnapshots[i],
+            snapshotDate = SnapshotService.getSnapshotDate(snapshot);
+        if (snapshotDate !== endDate) {
+          break;
+        }
+        $scope.itemTypeCount[snapshot.type].endCount++;
+      }
+    }
 
     Nvd3ChartBuilder.loadCFDChartData($scope,
-      SnapshotService.processSnapshots(retainedSnapshots));
+      SnapshotService.buildSnapshotSeriesByDate(snapshotsDates, retainedSnapshots));
   }
 
   $scope.$on('refresh', refreshCFDGraph);
@@ -169,6 +212,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   $scope.fromStatus = SYS_CONFIG.defaultLeadTimeStartStatus;
   $scope.toStatus = SYS_CONFIG.defaultLeadTimeEndStatus;
   $scope.ownerId = null;
+  $scope.totalTime = 0;
   $scope.medianLeadTime = 0;
   $scope.meanLeadTime = 0;
 
@@ -261,9 +305,13 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     if (!_.isEmpty(itemsRetained)) {
       var totalDuration = _.pluck(itemsRetained, 'totalDuration');
 
+      $scope.totalTime = (_.reduce(totalDuration, function(sum, n) {
+        return sum + n;
+      }) / 24.0).toFixed(1);
       $scope.meanLeadTime = (math.mean(totalDuration) / 24.0).toFixed(1);
       $scope.medianLeadTime = (math.median(totalDuration) / 24.0).toFixed(1);
     } else {
+      $scope.totalTime = 0;
       $scope.meanLeadTime = 0;
       $scope.medianLeadTime = 0;
     }

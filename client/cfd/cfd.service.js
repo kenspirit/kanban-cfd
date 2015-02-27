@@ -90,11 +90,7 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
     return {
       getSnapshotDatesFromSnapshot: getSnapshotDatesFromSnapshot,
       buildSnapshotSeriesByDate: buildSnapshotSeriesByDate,
-      processSnapshots: function(snapshots) {
-        var snapshotDates = getSnapshotDatesFromSnapshot(snapshots);
-
-        return buildSnapshotSeriesByDate(snapshotDates, snapshots);
-      },
+      getSnapshotDate: getSnapshotDate,
       loadSnaptshots: function(query) {
         return SnapshotService.load(query).$promise
           .then(function(response) {
