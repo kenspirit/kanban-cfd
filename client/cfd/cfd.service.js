@@ -1,6 +1,13 @@
 /* global moment */
 
 angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
+  .factory('UnitConverter', function() {
+    return {
+      inDay: function(durationInHour) {
+        return (durationInHour / 24.0).toFixed(1);
+      }
+    };
+  })
   .factory('QueryBuilder', ['SYS_CONFIG', function(SYS_CONFIG) {
     return {
       getQueryParam: function($scope) {
@@ -116,6 +123,7 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
         type: item.type,
         owner: item.owner,
         blockLog: item.blockLog,
+        estimate: item.estimate,
         statusDuration: [], // In hours
         totalDuration: 0 // In hours
       };
@@ -155,6 +163,12 @@ angular.module('Kanban.service', ['Kanban.config', 'ngResource'])
         if (result.statusDuration[statusIdx] < 0) {
           result.statusDuration[statusIdx] = 0;
         }
+      });
+
+      _.forEach(result.blockLog, function(value, status) {
+        // Convert to hours unit
+        result.blockLog[status][0] = parseInt(
+          result.blockLog[status][0] / (3600 * 1000));
       });
 
       result.totalDuration =

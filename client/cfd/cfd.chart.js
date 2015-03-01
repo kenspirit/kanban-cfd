@@ -1,8 +1,8 @@
 /* global _, moment */
 
 angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
-  .factory('Nvd3ChartBuilder', ['SYS_CONFIG', 'SnapshotService',
-      function(SYS_CONFIG, SnapshotService) {
+  .factory('Nvd3ChartBuilder', ['SYS_CONFIG', 'SnapshotService', 'UnitConverter',
+      function(SYS_CONFIG, SnapshotService, UnitConverter) {
 
     function tranformCFDData(cfdSeries) {
       var cfdData = _.map(SYS_CONFIG.kanbanStatusNames, function(status) {
@@ -51,11 +51,19 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
             key + ': <span style="font-weight: bold"> ' + y + '</span>';
           if (e.point[2]) {
             tips += ' Blocked <span style="font-weight: bold; color: red">'
-              + (e.point[2] / (24.0 * 3600 * 1000)).toFixed(1)
+              + UnitConverter.inDay(e.point[2])
               + '</span> days for reason: ' + e.point[3];
           }
           return tips;
         };
+
+        $scope.yValue = function(d) {
+          return d3.format('.1f')(d);
+        };
+
+        $scope.showItemName = function(key, x, y, e) {
+          return e.point[2];
+        }
       },
 
       getLeadTimeChartData: function($scope, displayStatus, itemDetails) {
@@ -70,7 +78,6 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
 
           for (var j = 0; j < itemDetails.length; j++) {
             var item = itemDetails[j],
-                // durationInHour = (item.statusDuration[i] / 24.0).toFixed(1);
                 durationInHour = item.statusDuration[i] / 24.0,
                 result = [item.name, durationInHour];
 
@@ -91,12 +98,6 @@ angular.module('Kanban.chart', ['Kanban.config', 'Kanban.service'])
         $scope.toolTipContentFunction = function(key, x, y/*, e, graph*/) {
           return '<h4>' + key + '</h4>' +
             '<span style="font-weight: bold"> ' + y + '</span>';
-        };
-
-        $scope.itemToolTipContentFunction = function(key, x, y, e/*, graph*/) {
-          return '<h4>' + key + '</h4>' +
-            '<span style="font-weight: bold"> ' + y + '</span> for ' +
-            (e.point[2] ? e.point[2] : 'None');
         };
       },
 

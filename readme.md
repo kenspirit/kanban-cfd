@@ -20,6 +20,10 @@ When you mouse over an item, it will further tell how long it spends on one stag
 
 ![Item Lead Time](./Item_Leadtime.png)
 
+Shows the comparison between estimate time, lead time and lead time without considering blocking duration.
+
+![Estimate vs Lead Time](./Estimate_vs_Leadtime.png)
+
 ### Blocked Statistics
 
 This graph is showing blocked statistics grouped by Kanban stage and blocked reason.  In order to not blowing the graph, the blocked reason is probably best to limit to particular category, say Priority Switched, Prod Support, Resource Limited, Env Down, etc.
@@ -80,7 +84,8 @@ It expects to have a single date string input.  Its output expects to be a Promi
   objectID: , // Unique Kanban item Id
   type: , // Kanban item type matches the keys of kanbanItemTypes
   name: , // Kanban item name to show in Item Detail graph
-  owner: , // Kanban item owner
+  owner: , // Kanban item owner,
+  estimate: , // Esimated time used to mearure against lead time
   statusChangeLog: [{
     from: ,
     to: , // from & to value should be ISO format date string

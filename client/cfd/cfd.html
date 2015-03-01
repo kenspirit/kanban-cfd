@@ -126,6 +126,13 @@
                 </nvd3-multi-bar-horizontal-chart>
               </div>
             </div>
+            <h4>Estimate vs Lead Time vs Lead Time w/o Blocked</h4>
+            <div class="row">
+              <div class="col-md-12">
+                <nvd3-line-chart data="leadTimeEstimateData" id="LeadTimeEstimate{{ownerId}}" width="1280" height="550" showXAxis="true" showYAxis="true" showLegend="true" interactive="true" tooltips="true" yAxisTickFormat="yValue" tooltipcontent="showItemName">
+                </nvd3-line-chart>
+              </div>
+            </div>
           </div>
         </accordion-group>
         <accordion-group heading="Blocked Statistics" is-open="graph.blocked[$index]">

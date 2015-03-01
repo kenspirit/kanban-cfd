@@ -1,6 +1,6 @@
 {
   "name": "kanban-cfd",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Kanban CFD Visualization",
   "main": "index.js",
   "keywords": [

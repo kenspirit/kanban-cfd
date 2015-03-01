@@ -91,7 +91,7 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
 
   $scope.$watch('owners', function(newValue, oldValue) {
     // Change detected to prevent unexpected change for initial loading time
-    // And the change on "open" attribute which is not needed for refreshing data
+    // And the change on 'open' attribute which is not needed for refreshing data
     var selectedOwner = null;
 
     if (newValue.length === oldValue.length) {
@@ -206,7 +206,8 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
   $scope.$on('refresh', refreshCFDGraph);
 }])
 .controller('LeadTimeCtrl', ['$scope', 'SYS_CONFIG', 'ItemDetailService', 'Nvd3ChartBuilder',
-  function($scope, SYS_CONFIG, ItemDetailService, Nvd3ChartBuilder) {
+    'UnitConverter',
+  function($scope, SYS_CONFIG, ItemDetailService, Nvd3ChartBuilder, UnitConverter) {
 
   $scope.leadTimeDuration = SYS_CONFIG.defaultLeadTimeDuration;
   $scope.fromStatus = SYS_CONFIG.defaultLeadTimeStartStatus;
@@ -261,6 +262,8 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
       });
     }
 
+    statusList = filterStatus(fromStatusIdx, toStatusIdx);
+
     function filterItemStatus(fromStatusIdx, toStatusIdx, items) {
       return _.reduce(items, function(retainedItems, item) {
         if (_.isEmpty(item.statusDuration)) {
@@ -269,10 +272,19 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
 
         var cloneItem = {
           name: item.name,
+          estimate: item.estimate,
           statusDuration: [],
           totalDuration: 0,
-          blockLog: item.blockLog
+          blockedDuration: 0,
+          blockLog: {}
         };
+
+        _.forEach(item.blockLog, function(log, status) {
+          if (statusList.indexOf(status) > -1) {
+            cloneItem.blockLog[status] = log;
+            cloneItem.blockedDuration += log[0];
+          }
+        });
 
         _.forEach(item.statusDuration, function(duration, index) {
           if (index >= fromStatusIdx && index <= toStatusIdx) {
@@ -305,11 +317,11 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     if (!_.isEmpty(itemsRetained)) {
       var totalDuration = _.pluck(itemsRetained, 'totalDuration');
 
-      $scope.totalTime = (_.reduce(totalDuration, function(sum, n) {
-        return sum + n;
-      }) / 24.0).toFixed(1);
-      $scope.meanLeadTime = (math.mean(totalDuration) / 24.0).toFixed(1);
-      $scope.medianLeadTime = (math.median(totalDuration) / 24.0).toFixed(1);
+      $scope.totalTime = UnitConverter.inDay(
+        _.reduce(totalDuration, function(sum, n) {return sum + n;})
+      );
+      $scope.meanLeadTime = UnitConverter.inDay(math.mean(totalDuration));
+      $scope.medianLeadTime = UnitConverter.inDay(math.median(totalDuration));
     } else {
       $scope.totalTime = 0;
       $scope.meanLeadTime = 0;
@@ -320,8 +332,38 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
     itemsRetained = filterItemByDuration(itemsRetained)
       .sort(itemDetailComparator);
 
-    Nvd3ChartBuilder.getLeadTimeChartData($scope,
-      filterStatus(fromStatusIdx, toStatusIdx), itemsRetained);
+    Nvd3ChartBuilder.getLeadTimeChartData($scope, statusList, itemsRetained);
+
+    var leadTimeEstimateData = [
+       {
+         'key': 'Estimate',
+         'values': []
+       },
+       {
+         'key': 'Lead Time',
+         'values': []
+       },
+       {
+         'key': 'Lead Time w/o Block',
+         'values': []
+       }
+     ];
+
+     var sortedItems = _.sortBy(itemsRetained, function(item) {
+       return item.totalDuration;
+     });
+
+     _.forEach(sortedItems, function(item, index) {
+       var itemId = index, name = item.name;
+
+       leadTimeEstimateData[0].values.push([itemId, item.estimate, name]);
+       leadTimeEstimateData[1].values.push(
+         [itemId, item.totalDuration / 24.0, name]);
+       leadTimeEstimateData[2].values.push(
+         [itemId, (item.totalDuration - item.blockedDuration) / 24.0, name]);
+     });
+
+     $scope.leadTimeEstimateData = leadTimeEstimateData;
   };
 
 }])
@@ -369,11 +411,14 @@ app.controller('KanbanCtrl', ['$scope', 'SYS_CONFIG',
 
           if (item.blockLog[status]) {
             // In Days
-            blockedDuration = item.blockLog[status][0] / (24.0 * 3600 * 1000);
+            blockedDuration = item.blockLog[status][0] / 24.0;
             reason = item.blockLog[status][1];
 
             if (blockedDuration > duration) {
-              cloneItem.blockLog[status] = [blockedDuration, reason ? reason : 'None'];
+              cloneItem.blockLog[status] = [
+                blockedDuration,
+                reason ? reason : 'None'
+              ];
             }
           }
         });

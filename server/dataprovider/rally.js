@@ -12,7 +12,6 @@ var wsPageSize = 100; // Max is 100
 var workspace = 0;
 var project = 0;
 var kanbanFieldName = 'c_KanbanState';
-// https://rally1.rallydev.com/slm/webservice/v2.0/user?query=(UserName = userName)&fetch=ObjectID
 
 function getRallyAuthHeader() {
   var headers = {'Authorization': 'Basic ' +
@@ -155,7 +154,10 @@ var KanbanProvider = {
           //     '_ValidFrom': '2014-01-27T02:17:13.527Z',
           //     '_ValidTo': '2014-01-27T02:17:54.245Z',
           //     'c_KanbanState': 'In Test',
-          //     "_TypeHierarchy": [
+          //     'Blocked': '',
+          //     'BlockedReason': '',
+          //     'PlanEstimate': 3.0,
+          //     '_TypeHierarchy': [
           //       "PersistableObject",
           //       "DomainObject",
           //       "WorkspaceDomainObject",
@@ -178,6 +180,8 @@ var KanbanProvider = {
 
           item.owner = snapshot.Owner;
           item.name = snapshot.FormattedID + ': ' + snapshot.Name;
+          item.estimate = snapshot.PlanEstimate;
+
           item.statusChangeLog.push({
             from: snapshot._ValidFrom,
             to: snapshot._ValidTo,
@@ -217,7 +221,7 @@ var KanbanProvider = {
     findObj._ValidFrom = {'$gte': start.toISOString()};
 
     var fields = ['_ValidFrom', '_ValidTo', 'ObjectID', '_TypeHierarchy',
-      'Name', 'Owner', 'FormattedID', 'Blocked', 'BlockedReason', kanbanFieldName],
+      'Name', 'Owner', 'FormattedID', 'Blocked', 'BlockedReason', 'PlanEstimate', kanbanFieldName],
         hydrate = ['_TypeHierarchy'];
 
     return restPromise(dataUrl + '?find=' + JSON.stringify(findObj) +

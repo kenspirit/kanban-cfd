@@ -19,7 +19,7 @@ describe('Rally Snapshot', function() {
     }, {});
 
     var itemFields =
-      ['objectID', 'type', 'statusChangeLog', 'owner', 'name', 'kanbanizedOn', 'blockLog'];
+      ['objectID', 'type', 'statusChangeLog', 'owner', 'name', 'kanbanizedOn', 'blockLog', 'estimate'];
 
     // Stub data retrieval method
     var getsnapshotsStub = sinon.stub(rally, 'getRallySnapshot');
