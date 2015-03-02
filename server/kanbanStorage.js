@@ -86,8 +86,9 @@ function KanbanStorage(dataFileLocation) {
   /*
   The expected input is an array containing object with below structure
   {
-    objectID:
+    objectID: ,
     name: ,
+    estimate: ,
     type: ,
     owner: ,
     statusChangeLog: [{
@@ -119,7 +120,8 @@ function KanbanStorage(dataFileLocation) {
             {$addToSet: setUpdate},
             {$set: {
                 owner: item.owner,
-                name: item.name
+                name: item.name,
+                estimate: item.estimate
               }
             }
           );
@@ -214,6 +216,7 @@ function KanbanStorage(dataFileLocation) {
     objectID: ,
     type: ,
     name: ,
+    estiamte: ,
     owner: ,
     statusChangeLog: [{
       from: , // expected format is '2014-01-27T02:17:13.527Z'
